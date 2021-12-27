@@ -1,14 +1,17 @@
 import { DoBootstrap, NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IntervalService } from './interval.service';
+import { WebWorkerNgrxModule } from '@ng-web-worker/worker/ngrx';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { IntervalEffects } from './interval.effects';
 
 @NgModule({
-  imports: [CommonModule],
-  providers: [IntervalService],
+  imports: [
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot([IntervalEffects]),
+    WebWorkerNgrxModule,
+  ],
 })
 export class WorkerImplModule implements DoBootstrap {
-  constructor(private intervalService: IntervalService) {}
-
   ngDoBootstrap(): void {
     console.log('ngDoBootstrap');
   }

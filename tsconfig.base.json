@@ -19,7 +19,8 @@
       "@ng-web-worker/worker-impl": ["libs/worker-impl/src/index.ts"],
       "@ng-web-worker/worker/communication": [
         "libs/worker/communication/src/index.ts"
-      ]
+      ],
+      "@ng-web-worker/worker/ngrx": ["libs/worker/ngrx/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

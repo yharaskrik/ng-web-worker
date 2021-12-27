@@ -18,14 +18,15 @@
         "styles": ["apps/client/src/styles.scss"],
         "scripts": [],
         "buildOptimizer": false,
-        "optimization": true,
         "vendorChunk": true,
+        "optimization": false,
         "webWorkerTsConfig": "apps/client/tsconfig.worker.json",
         "aot": false
       },
       "configurations": {
         "production": {
           "aot": true,
+          "optimization": true,
           "budgets": [
             {
               "type": "initial",

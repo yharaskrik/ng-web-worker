@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export interface MessageEventPayload<T = any> {
   worker: string;
@@ -15,7 +15,7 @@ export type SendMessagePayload<T = any> = Omit<
 >;
 
 export interface NgWebWorkerCommunication {
-  messages$: Subject<NgWorkerEvent>;
+  stream(): Observable<NgWorkerEvent>;
 
   registerMessageListener(port: MessagePort | BroadcastChannel): void;
 

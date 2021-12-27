@@ -35,7 +35,9 @@
           "libs/worker/src/**/*.ts",
           "libs/worker/src/**/*.html",
           "libs/worker/communication/**/*.ts",
-          "libs/worker/communication/**/*.html"
+          "libs/worker/communication/**/*.html",
+          "libs/worker/ngrx/**/*.ts",
+          "libs/worker/ngrx/**/*.html"
         ]
       }
     }
