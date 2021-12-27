@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "lib": ["ESNext", "webworker"],
+    "lib": ["ESNext", "webworker", "dom"],
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,

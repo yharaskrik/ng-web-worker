@@ -1,12 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { NgWorkerEvent } from '@ng-web-worker/worker/communication';
+import { config } from '@ng-web-worker/worker-impl';
 
-interface MessageEventPayload<T = any> {
-  event: string;
-  payload: T;
-}
-
-type NgWorkerEvent = MessageEvent<MessageEventPayload>;
+/**
+ * This file will eventually be turned into a library as well and abstracted for reuse.
+ */
 
 const PORT_TRANSFER = 'portTransfer';
 
@@ -50,21 +49,27 @@ export class WorkerStoreService implements OnDestroy {
 
     this.workers.set(uuid, worker);
 
-    const channel = new MessageChannel();
+    if (config.broadcast) {
+      const bc = new BroadcastChannel('ng-web-worker-channel');
 
-    worker.postMessage(PORT_TRANSFER, [channel.port2]);
+      bc.onmessage = (ev) => this.messageChannel$.next(ev);
+    } else {
+      const channel = new MessageChannel();
 
-    this.channels.set(uuid, channel);
+      worker.postMessage(PORT_TRANSFER, [channel.port2]);
 
-    channel.port1.onmessage = (ev: NgWorkerEvent) => {
-      this.messageChannel$.next(ev);
+      this.channels.set(uuid, channel);
 
-      for (const [channelId, otherChannel] of this.channels.entries()) {
-        if (channelId !== uuid) {
-          otherChannel.port1.postMessage(ev.data);
+      channel.port1.onmessage = (ev: NgWorkerEvent) => {
+        this.messageChannel$.next(ev);
+
+        for (const [channelId, otherChannel] of this.channels.entries()) {
+          if (channelId !== uuid) {
+            otherChannel.port1.postMessage(ev.data);
+          }
         }
-      }
-    };
+      };
+    }
 
     return uuid;
   }

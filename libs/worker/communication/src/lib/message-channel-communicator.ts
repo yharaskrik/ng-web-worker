@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import {
+  MessageEventPayload,
+  NgWebWorkerCommunication,
+  SendMessagePayload,
+} from './types';
+import { NG_WEB_WORKER_CONTEXT } from './tokens';
 
 /**
  * Service to track the single MessageChannel with the main thread. A MessagePort will be transferred from
@@ -7,16 +13,16 @@ import { Subject } from 'rxjs';
  * messages back and forth (in the future the ngrx plugin will use this to send actions two ways)
  */
 @Injectable()
-export class PortService {
-  private messagePort: MessagePort | undefined;
+export class MessageChannelCommunicator implements NgWebWorkerCommunication {
+  private port: MessagePort | undefined;
 
   readonly messages$ = new Subject<MessageEvent>();
 
-  constructor() {
+  constructor(private workerId: string) {
     addEventListener('message', (ev) => {
       if (ev.data === 'portTransfer') {
-        this.messagePort = ev.ports[0];
-        this.registerMessageListener(this.messagePort);
+        this.port = ev.ports[0];
+        this.registerMessageListener(this.port);
       }
     });
   }
@@ -27,7 +33,13 @@ export class PortService {
     };
   }
 
-  sendMessage(message: any): void {
-    this.messagePort?.postMessage(message);
+  sendMessage<T = any>(message: SendMessagePayload<T>): void {
+    const payload: MessageEventPayload = {
+      ...message,
+      context: NG_WEB_WORKER_CONTEXT,
+      worker: this.workerId,
+    };
+
+    this.port?.postMessage(payload);
   }
 }

@@ -33,7 +33,9 @@
       "options": {
         "lintFilePatterns": [
           "libs/worker/src/**/*.ts",
-          "libs/worker/src/**/*.html"
+          "libs/worker/src/**/*.html",
+          "libs/worker/communication/**/*.ts",
+          "libs/worker/communication/**/*.html"
         ]
       }
     }

@@ -16,7 +16,10 @@
     "baseUrl": ".",
     "paths": {
       "@ng-web-worker/worker": ["libs/worker/src/index.ts"],
-      "@ng-web-worker/worker-impl": ["libs/worker-impl/src/index.ts"]
+      "@ng-web-worker/worker-impl": ["libs/worker-impl/src/index.ts"],
+      "@ng-web-worker/worker/communication": [
+        "libs/worker/communication/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

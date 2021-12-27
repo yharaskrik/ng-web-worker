@@ -16,22 +16,35 @@ import {
   WebWorkerApplicationRef,
 } from './platform-providers';
 import { WebWorkerCompilerOptions } from './compiler-options';
-import { PortService } from './port.service';
+import { NgWebWorkerConfig } from './types';
+import { NG_WEB_WORKER_CONFIG, NG_WORKER_ID } from './tokens';
+import {
+  BroadcastChannelCommunicator,
+  COMMUNICATOR,
+  MessageChannelCommunicator,
+} from '@ng-web-worker/worker/communication';
 
-/**
- * PortService needs to be instantiated as soon as possible because it adds an event listener
- * that will accept the MessagePort for use with communicating back and forth.
- */
-const portService = new PortService();
+const workerId = (Math.random() + 1).toString(36).substring(7);
 
 /**
  * Platform definition for WebWorker, it opts to leave out anything that is not needed for running without
  * the DOM
  */
-export const platformWebWorker = createPlatformFactory(
-  platformCore,
-  'webWorker',
-  [
+export const platformWebWorkerFactory = (config: NgWebWorkerConfig) => {
+  /*
+   * The Communicator needs to be instantiated as soon as possible because it
+   *
+   * In the case of MessageChannelCommunicator:
+   * Adds an event listener that will accept the MessagePort for use with communicating back and forth.
+   *
+   * In the case of BroadcastChannel:
+   * It does not matter too much as there is no initial transfer of ports.
+   */
+  const communicator = config.broadcast
+    ? new BroadcastChannelCommunicator(workerId)
+    : new MessageChannelCommunicator(workerId);
+
+  return createPlatformFactory(platformCore, 'webWorker', [
     {
       provide: ErrorHandler,
       useClass: WebHandlerErrorHandler,
@@ -58,11 +71,19 @@ export const platformWebWorker = createPlatformFactory(
       deps: [COMPILER_OPTIONS],
     },
     {
-      provide: PortService,
-      useValue: portService,
+      provide: NG_WEB_WORKER_CONFIG,
+      useValue: config,
     },
-  ]
-);
+    {
+      provide: COMMUNICATOR,
+      useValue: communicator,
+    },
+    {
+      provide: NG_WORKER_ID,
+      useValue: workerId,
+    },
+  ]);
+};
 
 /**
  * This function is used in the library that will setup the custom Angular code to start up in the WebWorker.
@@ -72,12 +93,16 @@ export const platformWebWorker = createPlatformFactory(
  *
  * `ngZone` is obviously unneeded as there is no monkey patching required when there is no DOM.
  * @param moduleType
+ * @param config
  * @param compilerOptions
  */
 export function bootstrapNgWebWorker<M>(
   moduleType: Type<M>,
+  config: NgWebWorkerConfig,
   compilerOptions?: WebWorkerCompilerOptions
 ) {
+  const platformWebWorker = platformWebWorkerFactory(config);
+
   return platformWebWorker().bootstrapModule(moduleType, {
     ...(compilerOptions ?? {}),
     ngZone: 'noop',

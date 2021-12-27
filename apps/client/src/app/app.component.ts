@@ -20,6 +20,10 @@ export class AppComponent {
       () => new Worker(new URL('./secondary.worker', import.meta.url))
     );
 
-    this.messages$.subscribe(console.log);
+    this.messages$.subscribe((m) =>
+      console.log(
+        `Message event in main thread from worker ${m.data.worker} with payload ${m.data.payload}`
+      )
+    );
   }
 }
