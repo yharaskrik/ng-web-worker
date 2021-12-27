@@ -5,7 +5,7 @@
   },
   "cli": {
     "defaultCollection": "@nrwl/angular",
-    "packageManager": "npm"
+    "packageManager": "yarn"
   },
   "implicitDependencies": {
     "package.json": {
@@ -39,7 +39,9 @@
     },
     "@nrwl/angular:library": {
       "linter": "eslint",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "buildable": true,
+      "standaloneConfig": true
     },
     "@nrwl/angular:component": {
       "style": "scss"

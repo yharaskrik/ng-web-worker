@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/worker",
+    "lib": ["es2018", "webworker"],
+    "types": [],
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "include": ["src/**/*.worker.ts"],
+  "angularCompilerOptions": {
+    "compilationMode": "partial"
+  }
+}
