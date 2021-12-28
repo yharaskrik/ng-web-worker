@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@angular/core';
-import { WebWorkerActions } from './web-worker-actions';
 import { Actions, createEffect } from '@ngrx/effects';
 import { filter, map } from 'rxjs';
 import {
   COMMUNICATOR,
+  MessageEventPayload,
   NgWebWorkerCommunication,
 } from '@ng-web-worker/worker/communication';
+import { NG_WORKER_ID } from '@ng-web-worker/worker';
+import { Action } from '@ngrx/store';
 
 @Injectable()
 export class ActionConnector {
@@ -13,7 +15,21 @@ export class ActionConnector {
    * Will stream the actions received through the messaging channels to the Store within
    * this web worker.
    */
-  readonly channelToAction$ = createEffect(() => this.webWorkerActions$);
+  readonly channelToAction$ = createEffect(() =>
+    this.communicator.stream().pipe(
+      map((event) => event.data),
+      filter(
+        (data): data is MessageEventPayload<Action & { workerId: string }> =>
+          /*
+           * We should only be mapping external actions (from other web workers or main thread) to the action
+           * stream within this web worker.
+           */
+          data.event === 'action' &&
+          (!data.payload.workerId || this.workerId !== data.payload.workerId)
+      ),
+      map((data) => data.payload)
+    )
+  );
 
   /**
    * We need to ensure that any actions dispatched from within this Web Worker need to be sent through
@@ -24,7 +40,7 @@ export class ActionConnector {
   readonly actionToChannel$ = createEffect(
     () =>
       this._actions$.pipe(
-        filter((action) => !(action as any).external),
+        filter((action) => !(action as any).workerId),
         map((action) => {
           this.communicator.sendMessage({
             event: 'action',
@@ -32,7 +48,7 @@ export class ActionConnector {
              * External must be patched onto the action here otherwise when the other contexts receive it
              * they will not allow it to pass through the stream from `WebWorkerActions`
              */
-            payload: { ...action, external: true },
+            payload: { ...action, workerId: this.workerId },
           });
         })
       ),
@@ -41,7 +57,7 @@ export class ActionConnector {
 
   constructor(
     @Inject(COMMUNICATOR) private communicator: NgWebWorkerCommunication,
-    private webWorkerActions$: WebWorkerActions,
+    @Inject(NG_WORKER_ID) private workerId: string,
     private _actions$: Actions
   ) {}
 }

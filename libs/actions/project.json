@@ -1,0 +1,42 @@
+{
+  "projectType": "library",
+  "root": "libs/actions",
+  "sourceRoot": "libs/actions/src",
+  "prefix": "ng-web-worker",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:ng-packagr-lite",
+      "outputs": ["dist/libs/actions"],
+      "options": {
+        "project": "libs/actions/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/actions/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/actions/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/actions"],
+      "options": {
+        "jestConfig": "libs/actions/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/actions/src/**/*.ts",
+          "libs/actions/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
 import {
   MessageEventPayload,
   NgWebWorkerCommunication,
@@ -22,18 +21,19 @@ export class BroadcastChannelCommunicator
   extends BaseChannelCommunicator
   implements NgWebWorkerCommunication
 {
-  private readonly port: MessagePort | BroadcastChannel | undefined;
+  private readonly port: BroadcastChannel;
 
   constructor(private workerId: string) {
     super();
     this.port = new BroadcastChannel(NG_WEB_WORKER_BROADCAST_CHANNEL);
+
+    this.registerMessageListener(this.port);
   }
 
-  registerMessageListener(port: MessagePort | BroadcastChannel): void {
-    port.onmessage = (ev) => {
-      if (ev.data.context === NG_WEB_WORKER_CONTEXT) {
-        this.eventStream$.next(ev as NgWorkerEvent);
-      }
+  registerMessageListener(port: BroadcastChannel): void {
+    port.onmessage = (ev: NgWorkerEvent) => {
+      // Want to make sure we do not infinitely loop somehow. Workers should not end up broadcasting to themselves
+      if (ev.data.worker !== this.workerId) this.eventStream$.next(ev);
     };
   }
 

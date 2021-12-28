@@ -1,6 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { NgWorkerEvent } from '@ng-web-worker/worker/communication';
+import {
+  NG_WEB_WORKER_BROADCAST_CHANNEL,
+  NgWorkerEvent,
+} from '@ng-web-worker/worker/communication';
 import { config } from '@ng-web-worker/worker-impl';
 
 /**
@@ -42,7 +45,13 @@ export class WorkerStoreService implements OnDestroy {
 
   readonly messageChannel$ = new Subject<NgWorkerEvent>();
 
-  registerWorker(factory: WorkerFactory): string {
+  bc = new BroadcastChannel(NG_WEB_WORKER_BROADCAST_CHANNEL);
+
+  constructor() {
+    this.bc.onmessage = (ev) => this.messageChannel$.next(ev);
+  }
+
+  registerWorker(factory: WorkerFactory): BroadcastChannel | MessagePort {
     const worker = factory();
 
     const uuid = rand();
@@ -50,9 +59,8 @@ export class WorkerStoreService implements OnDestroy {
     this.workers.set(uuid, worker);
 
     if (config.broadcast) {
-      const bc = new BroadcastChannel('ng-web-worker-channel');
-
-      bc.onmessage = (ev) => this.messageChannel$.next(ev);
+      // already configured
+      return this.bc;
     } else {
       const channel = new MessageChannel();
 
@@ -69,9 +77,9 @@ export class WorkerStoreService implements OnDestroy {
           }
         }
       };
-    }
 
-    return uuid;
+      return channel.port1;
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,8 +1,3 @@
-addEventListener('message', (ev) => {
-  if (ev.data === 'portTransfer') {
-    const port = ev.ports[0];
+import { initSecWebWorker } from '@ng-web-worker/worker-impl-sec';
 
-    port.onmessage = (ev) =>
-      console.log('Received on secondary from ', ev.data.worker);
-  }
-});
+initSecWebWorker();
