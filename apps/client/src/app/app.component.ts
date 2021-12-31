@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { hi } from '@ng-web-worker/actions';
-import { NG_IN_WEB_WORKER_CONTEXT } from '@ng-web-worker/worker/core';
 import { WebWorkerRegistry } from '@ng-web-worker/worker';
+import { COMMUNICATOR, MessageDispatcher } from '@ng-web-worker/worker/core';
 
 @Component({
   selector: 'ng-web-worker-root',
@@ -9,7 +9,10 @@ import { WebWorkerRegistry } from '@ng-web-worker/worker';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  constructor(private webWorkerRegistry: WebWorkerRegistry) {
+  constructor(
+    private webWorkerRegistry: WebWorkerRegistry,
+    @Inject(COMMUNICATOR) private communicator: MessageDispatcher
+  ) {
     this.webWorkerRegistry.registerWorker({
       workerId: 'worker1',
       factory: () => new Worker(new URL('./client.worker', import.meta.url)),
@@ -25,10 +28,8 @@ export class AppComponent {
     // After two seconds broadcast a `hi` action to all web workers
     setTimeout(() => {
       console.log('Posting first message');
-      this.webWorkerRegistry.sendMessageToWorker('worker2', {
-        workerId: 'main',
+      this.communicator.sendMessage({
         event: 'action',
-        context: NG_IN_WEB_WORKER_CONTEXT,
         payload: {
           ...hi(),
           workerId: 'main',

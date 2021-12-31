@@ -5,7 +5,7 @@ import {
   NG_IN_WEB_WORKER_CONTEXT,
   SendMessagePayload,
 } from '@ng-web-worker/worker/core';
-import { WebWorkerRegistry } from '@ng-web-worker/worker';
+import { WebWorkerRegistry } from './web-worker-registry';
 
 @Injectable()
 export class MainThreadCommunicator implements MessageDispatcher {

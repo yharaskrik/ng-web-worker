@@ -1,9 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { filter, Observable, Subject } from 'rxjs';
-import {
-  NG_IN_WEB_WORKER_CONTEXT,
-  NgInWorkerEvent,
-} from '@ng-web-worker/worker/core';
+import { NG_IN_WEB_WORKER_CONTEXT } from './tokens';
+import { NgInWorkerEvent } from './types';
 
 /**
  * The BaseChannelCommunicator contains the shared properties that both the Broadcast method and MessageChannel

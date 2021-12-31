@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { NgInWorkerConfig } from './types';
 import {
   MessageEventPayload,
   MessageEventStream,
+  NgInWorkerConfig,
+  NgInWorkerEvent,
   NG_IN_WORKER_PORT_TRANSFER,
   NG_WEB_WORKER_BROADCAST_CHANNEL,
-  NgInWorkerEvent,
 } from '@ng-web-worker/worker/core';
 
 @Injectable()

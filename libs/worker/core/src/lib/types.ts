@@ -15,3 +15,11 @@ export type SendMessagePayload<T = any> = Omit<
 export interface MessageDispatcher {
   sendMessage<T = any>(message: SendMessagePayload<T>): void;
 }
+
+export type WorkerFactory = () => Worker;
+
+export interface NgInWorkerConfig {
+  workerId: string;
+  broadcast: boolean;
+  factory?: WorkerFactory;
+}

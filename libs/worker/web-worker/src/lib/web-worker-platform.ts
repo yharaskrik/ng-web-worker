@@ -1,9 +1,9 @@
 import {
-  APP_INITIALIZER,
   ApplicationInitStatus,
   ApplicationRef,
-  COMPILER_OPTIONS,
+  APP_INITIALIZER,
   CompilerFactory,
+  COMPILER_OPTIONS,
   createPlatformFactory,
   ErrorHandler,
   Optional,
@@ -12,16 +12,18 @@ import {
 } from '@angular/core';
 import { JitCompilerFactory } from '@angular/platform-browser-dynamic';
 import {
+  COMMUNICATOR,
+  MessageEventStream,
+  NgInWorkerConfig,
+} from '@ng-web-worker/worker/core';
+import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
+import { MessageChannelCommunicator } from './communication/message-channel-communicator';
+import { WebWorkerCompilerOptions } from './compiler-options';
+import {
   WebHandlerErrorHandler,
   WebWorkerApplicationRef,
 } from './platform-providers';
-import { WebWorkerCompilerOptions } from './compiler-options';
 import { NG_WEB_WORKER_CONFIG, NG_WORKER_ID } from './tokens';
-
-import { NgInWorkerConfig } from '@ng-web-worker/worker';
-import { MessageChannelCommunicator } from './communication/message-channel-communicator';
-import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
-import { COMMUNICATOR, MessageEventStream } from '@ng-web-worker/worker/core';
 
 const workerId = (Math.random() + 1).toString(36).substring(7);
 

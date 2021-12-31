@@ -1,8 +1,10 @@
+export * from './lib/message-event-stream';
 export * from './lib/tokens';
 export type {
-  MessageEventPayload,
-  SendMessagePayload,
-  NgInWorkerEvent,
   MessageDispatcher,
+  MessageEventPayload,
+  NgInWorkerConfig,
+  NgInWorkerEvent,
+  SendMessagePayload,
+  WorkerFactory,
 } from './lib/types';
-export * from './lib/message-event-stream';

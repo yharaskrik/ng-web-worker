@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { NgInWorkerConfig } from '@ng-web-worker/worker';
+import { NgInWorkerConfig } from '@ng-web-worker/worker/core';
 
 export const NG_WEB_WORKER_CONFIG = new InjectionToken<NgInWorkerConfig>(
   'ng-web-worker-config'

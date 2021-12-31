@@ -1,6 +1,6 @@
-import { WorkerImplModule } from './lib/worker-impl.module';
+import { NgInWorkerConfig } from '@ng-web-worker/worker/core';
 import { bootstrapNgWebWorker } from '@ng-web-worker/worker/web-worker';
-import { NgInWorkerConfig } from '@ng-web-worker/worker';
+import { WorkerImplModule } from './lib/worker-impl.module';
 
 export const config: NgInWorkerConfig = {
   broadcast: false,
