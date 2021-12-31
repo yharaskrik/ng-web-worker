@@ -1,13 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
-import { filter, map, tap } from 'rxjs';
-import {
-  COMMUNICATOR,
-  NgWebWorkerCommunication,
-} from '@ng-web-worker/worker/web-worker';
+import { filter, map } from 'rxjs';
 import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
 import { Action } from '@ngrx/store';
-import { MessageEventPayload } from '@ng-web-worker/worker/core';
+import {
+  COMMUNICATOR,
+  MessageDispatcher,
+  MessageEventPayload,
+  MessageEventStream,
+} from '@ng-web-worker/worker/core';
 
 @Injectable()
 export class WebWorkerActionConnector {
@@ -16,7 +17,7 @@ export class WebWorkerActionConnector {
    * this web worker.
    */
   readonly channelToAction$ = createEffect(() =>
-    this.communicator.stream().pipe(
+    this.messageEventStream.stream().pipe(
       map((event) => event.data),
       filter(
         (data): data is MessageEventPayload<Action & { workerId: string }> =>
@@ -32,15 +33,23 @@ export class WebWorkerActionConnector {
   );
 
   /**
-   * We need to ensure that any actions dispatched from within this Web Worker need to be sent through
-   * the communicator to the other contexts. We want to make sure that we are not just creating an infinite
-   * loop, so we check to see if the `external` property has been patched onto the action. If `external` is falsy
-   * then we know that the action originated from within this Web Worker, and it can be communicated back out.
+   * We need to ensure that any actions dispatched from within this context are sent to the other contexts.
+   *
+   * This effect will run from within Web Workers as well as in the main thread.
+   *
+   * If there is no workerId patched onto the action yet that means it originated from within this same context
+   * and needs to be send along through the channels.
+   *
+   * If there is a workerId, but we are currently in the `main` thread then we need to make sure our other contexts
+   * receive this action as well, so we allow it through to be sent along. In the `main` context the communicator is
+   * configured to send all messages to all registered MessageChannel ports and the Broadcast channel.
    */
   readonly actionToChannel$ = createEffect(
     () =>
       this._actions$.pipe(
-        filter((action) => !(action as any).workerId),
+        filter(
+          (action) => !(action as any).workerId || this.workerId === 'main'
+        ),
         map((action) => {
           this.communicator.sendMessage({
             event: 'action',
@@ -56,8 +65,9 @@ export class WebWorkerActionConnector {
   );
 
   constructor(
-    @Inject(COMMUNICATOR) private communicator: NgWebWorkerCommunication,
+    private messageEventStream: MessageEventStream,
     @Inject(NG_WORKER_ID) private workerId: string,
-    private _actions$: Actions
+    private _actions$: Actions,
+    @Inject(COMMUNICATOR) private communicator: MessageDispatcher
   ) {}
 }

@@ -13,19 +13,19 @@ export class AppComponent {
     this.webWorkerRegistry.registerWorker({
       workerId: 'worker1',
       factory: () => new Worker(new URL('./client.worker', import.meta.url)),
-      broadcast: true,
+      broadcast: false,
     });
 
     this.webWorkerRegistry.registerWorker({
       workerId: 'worker2',
       factory: () => new Worker(new URL('./secondary.worker', import.meta.url)),
-      broadcast: true,
+      broadcast: false,
     });
 
     // After two seconds broadcast a `hi` action to all web workers
     setTimeout(() => {
       console.log('Posting first message');
-      this.webWorkerRegistry.sendMessage('worker1', {
+      this.webWorkerRegistry.sendMessageToWorker('worker2', {
         workerId: 'main',
         event: 'action',
         context: NG_IN_WEB_WORKER_CONTEXT,

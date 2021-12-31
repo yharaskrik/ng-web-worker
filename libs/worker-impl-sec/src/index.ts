@@ -3,7 +3,7 @@ import { WorkerImplSecModule } from './lib/worker-impl-sec.module';
 import { NgInWorkerConfig } from '@ng-web-worker/worker';
 
 export const config: NgInWorkerConfig = {
-  broadcast: true,
+  broadcast: false,
   workerId: 'worker2',
 };
 

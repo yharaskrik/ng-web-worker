@@ -21,7 +21,7 @@ import { NG_WEB_WORKER_CONFIG, NG_WORKER_ID } from './tokens';
 import { NgInWorkerConfig } from '@ng-web-worker/worker';
 import { MessageChannelCommunicator } from './communication/message-channel-communicator';
 import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
-import { COMMUNICATOR } from './communication/tokens';
+import { COMMUNICATOR, MessageEventStream } from '@ng-web-worker/worker/core';
 
 const workerId = (Math.random() + 1).toString(36).substring(7);
 
@@ -30,6 +30,7 @@ const workerId = (Math.random() + 1).toString(36).substring(7);
  * the DOM
  */
 export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
+  const messageEventStream = new MessageEventStream();
   /*
    * The Communicator needs to be instantiated as soon as possible because it
    *
@@ -40,8 +41,8 @@ export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
    * It does not matter too much as there is no initial transfer of ports.
    */
   const communicator = config.broadcast
-    ? new BroadcastChannelCommunicator(workerId)
-    : new MessageChannelCommunicator(workerId);
+    ? new BroadcastChannelCommunicator(workerId, messageEventStream)
+    : new MessageChannelCommunicator(workerId, messageEventStream);
 
   return createPlatformFactory(platformCore, 'webWorker', [
     {
@@ -80,6 +81,10 @@ export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
     {
       provide: NG_WORKER_ID,
       useValue: workerId,
+    },
+    {
+      provide: MessageEventStream,
+      useValue: messageEventStream,
     },
   ]);
 };

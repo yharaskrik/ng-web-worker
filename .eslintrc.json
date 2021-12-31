@@ -24,6 +24,7 @@
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nrwl/nx/typescript"],
+      "plugins": ["eslint-plugin-import"],
       "rules": {}
     },
     {

@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@angular/core';
 import { NgWebWorkerCommunication } from './types';
-import { BaseChannelCommunicator } from './base-channel.communicator';
 import { NG_WORKER_ID } from '../tokens';
 import {
+  MessageDispatcher,
   MessageEventPayload,
+  MessageEventStream,
   NG_IN_WEB_WORKER_CONTEXT,
+  NG_IN_WORKER_PORT_TRANSFER,
   SendMessagePayload,
 } from '@ng-web-worker/worker/core';
 
@@ -15,15 +17,16 @@ import {
  */
 @Injectable()
 export class MessageChannelCommunicator
-  extends BaseChannelCommunicator
-  implements NgWebWorkerCommunication
+  implements NgWebWorkerCommunication, MessageDispatcher
 {
   private port: MessagePort | undefined;
 
-  constructor(@Inject(NG_WORKER_ID) private workerId: string) {
-    super();
+  constructor(
+    @Inject(NG_WORKER_ID) private workerId: string,
+    private messageEventStream: MessageEventStream
+  ) {
     addEventListener('message', (ev) => {
-      if (ev.data === 'portTransfer') {
+      if (ev.data === NG_IN_WORKER_PORT_TRANSFER) {
         this.port = ev.ports[0];
         this.registerMessageListener(this.port);
       }
@@ -32,7 +35,7 @@ export class MessageChannelCommunicator
 
   registerMessageListener(messagePort: MessagePort): void {
     messagePort.onmessage = (ev) => {
-      this.eventStream$.next(ev);
+      this.messageEventStream.dispatchMessage(ev);
     };
   }
 

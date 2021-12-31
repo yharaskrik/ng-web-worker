@@ -6,7 +6,14 @@ import { WorkerImplSecEffects } from './worker-impl-sec.effects';
 
 @NgModule({
   imports: [
-    StoreModule.forRoot({}),
+    StoreModule.forRoot(
+      {},
+      {
+        runtimeChecks: {
+          strictActionSerializability: true,
+        },
+      }
+    ),
     EffectsModule.forRoot([WorkerImplSecEffects]),
     WebWorkerNgrxModule,
   ],

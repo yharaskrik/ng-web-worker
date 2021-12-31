@@ -11,3 +11,7 @@ export type SendMessagePayload<T = any> = Omit<
   MessageEventPayload<T>,
   'workerId' | 'context'
 >;
+
+export interface MessageDispatcher {
+  sendMessage<T = any>(message: SendMessagePayload<T>): void;
+}

@@ -3,7 +3,7 @@ import { bootstrapNgWebWorker } from '@ng-web-worker/worker/web-worker';
 import { NgInWorkerConfig } from '@ng-web-worker/worker';
 
 export const config: NgInWorkerConfig = {
-  broadcast: true,
+  broadcast: false,
   workerId: 'worker1',
 };
 

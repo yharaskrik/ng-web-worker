@@ -1,38 +1,38 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { NgInWorkerConfig } from './types';
 import {
   MessageEventPayload,
+  MessageEventStream,
   NG_IN_WORKER_PORT_TRANSFER,
   NG_WEB_WORKER_BROADCAST_CHANNEL,
   NgInWorkerEvent,
 } from '@ng-web-worker/worker/core';
-import { Subject } from 'rxjs';
 
 @Injectable()
-export class WebWorkerRegistry implements OnDestroy {
+export class WebWorkerRegistry {
   private readonly workers = new Map<string, Worker>();
 
   private readonly workerConfigs = new Map<string, NgInWorkerConfig>();
 
-  private readonly messageChannels = new Map<string, MessageChannel>();
+  private readonly messageChannels = new Map<string, MessagePort>();
 
   private readonly broadcastChannel = new BroadcastChannel(
     NG_WEB_WORKER_BROADCAST_CHANNEL
   );
 
-  readonly stream$ = new Subject<NgInWorkerEvent>();
+  get ports(): (MessagePort | BroadcastChannel)[] {
+    const ports = this.messageChannels.values();
 
-  constructor() {
+    return [this.broadcastChannel, ...ports];
+  }
+
+  constructor(private messageEventStream: MessageEventStream) {
     /*
      * Set up the listener for the broadcast channel to ensure that all events are sent into the global
      * NgInWorker event stream
      */
     this.broadcastChannel.onmessage = (ev: NgInWorkerEvent) =>
-      this.stream$.next(ev);
-  }
-
-  ngOnDestroy(): void {
-    this.stream$.complete();
+      this.messageEventStream.dispatchMessage(ev);
   }
 
   /**
@@ -67,15 +67,16 @@ export class WebWorkerRegistry implements OnDestroy {
   registerWorkersMessageChannel(workerId: string, worker: Worker): void {
     const channel = new MessageChannel();
 
-    this.messageChannels.set(workerId, channel);
+    this.messageChannels.set(workerId, channel.port1);
 
     // Transfer port2 and leave port1 available for the main thread to sent messages to port2.
     worker.postMessage(NG_IN_WORKER_PORT_TRANSFER, [channel.port2]);
 
-    channel.port1.onmessage = (ev: NgInWorkerEvent) => this.stream$.next(ev);
+    channel.port1.onmessage = (ev: NgInWorkerEvent) =>
+      this.messageEventStream.dispatchMessage(ev);
   }
 
-  sendMessage(workerId: string, message: MessageEventPayload): void {
+  sendMessageToWorker(workerId: string, message: MessageEventPayload): void {
     const config = this.workerConfigs.get(workerId);
 
     if (!config) {
@@ -85,7 +86,7 @@ export class WebWorkerRegistry implements OnDestroy {
     if (config.broadcast) {
       this.broadcastChannel.postMessage(message);
     } else {
-      this.messageChannels.get(workerId)?.port1.postMessage(message);
+      this.messageChannels.get(workerId)?.postMessage(message);
     }
   }
 }
