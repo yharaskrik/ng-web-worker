@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { map, tap } from 'rxjs';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { helloThere, howAreYou, iAmFineThanks } from '@ng-web-worker/actions';
-import { NG_WORKER_ID } from '@ng-web-worker/worker';
+import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
 
 @Injectable()
 export class WorkerImplEffects {

@@ -1,7 +1,8 @@
 import { WorkerImplModule } from './lib/worker-impl.module';
-import { bootstrapNgWebWorker, NgWebWorkerConfig } from '@ng-web-worker/worker';
+import { bootstrapNgWebWorker } from '@ng-web-worker/worker/web-worker';
+import { NgInWorkerConfig } from '@ng-web-worker/worker';
 
-export const config: NgWebWorkerConfig = { broadcast: true };
+export const config: NgInWorkerConfig = { broadcast: true, workerId: '' };
 
 export async function initWebWorker() {
   await bootstrapNgWebWorker(WorkerImplModule, config);

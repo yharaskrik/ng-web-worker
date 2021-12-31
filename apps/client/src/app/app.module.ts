@@ -2,12 +2,11 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import { WorkerStoreService } from './worker-store.service';
+import { NgInWorkerModule } from '@ng-web-worker/worker';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule],
-  providers: [WorkerStoreService],
+  imports: [BrowserModule, NgInWorkerModule],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

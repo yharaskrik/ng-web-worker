@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { config } from '@ng-web-worker/worker-impl';
 import {
   NG_WEB_WORKER_BROADCAST_CHANNEL,
-  NgWorkerEvent,
-} from '@ng-web-worker/worker/communication';
-import { config } from '@ng-web-worker/worker-impl';
+  NgInWorkerEvent,
+} from '@ng-web-worker/worker/core';
 
 /**
  * This file will eventually be turned into a library as well and abstracted for reuse.
@@ -20,11 +20,11 @@ function rand() {
 
 export function ofEventType(event: string) {
   return function (
-    source: Observable<NgWorkerEvent>
-  ): Observable<NgWorkerEvent> {
-    return new Observable<NgWorkerEvent>((subscriber) => {
+    source: Observable<NgInWorkerEvent>
+  ): Observable<NgInWorkerEvent> {
+    return new Observable<NgInWorkerEvent>((subscriber) => {
       source.subscribe({
-        next(payload: NgWorkerEvent) {
+        next(payload: NgInWorkerEvent) {
           if (payload.data.event === event) {
             subscriber.next(payload);
           }
@@ -43,7 +43,7 @@ export class WorkerStoreService implements OnDestroy {
 
   private readonly channels = new Map<string, MessageChannel>();
 
-  readonly messageChannel$ = new Subject<NgWorkerEvent>();
+  readonly messageChannel$ = new Subject<NgInWorkerEvent>();
 
   bc = new BroadcastChannel(NG_WEB_WORKER_BROADCAST_CHANNEL);
 
@@ -68,7 +68,7 @@ export class WorkerStoreService implements OnDestroy {
 
       this.channels.set(uuid, channel);
 
-      channel.port1.onmessage = (ev: NgWorkerEvent) => {
+      channel.port1.onmessage = (ev: NgInWorkerEvent) => {
         this.messageChannel$.next(ev);
 
         for (const [channelId, otherChannel] of this.channels.entries()) {

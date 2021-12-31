@@ -37,7 +37,11 @@
           "libs/worker/communication/**/*.ts",
           "libs/worker/communication/**/*.html",
           "libs/worker/ngrx/**/*.ts",
-          "libs/worker/ngrx/**/*.html"
+          "libs/worker/ngrx/**/*.html",
+          "libs/worker/web-worker/**/*.ts",
+          "libs/worker/web-worker/**/*.html",
+          "libs/worker/core/**/*.ts",
+          "libs/worker/core/**/*.html"
         ]
       }
     }

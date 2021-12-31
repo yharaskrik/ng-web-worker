@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { NgWebWorkerCommunication } from './types';
+import { BaseChannelCommunicator } from './base-channel.communicator';
+import { NG_WORKER_ID } from '../tokens';
 import {
   MessageEventPayload,
-  NgWebWorkerCommunication,
+  NG_IN_WEB_WORKER_CONTEXT,
   SendMessagePayload,
-} from './types';
-import { NG_WEB_WORKER_CONTEXT } from './tokens';
-import { BaseChannelCommunicator } from './base-channel.communicator';
+} from '@ng-web-worker/worker/core';
 
 /**
  * Service to track the single MessageChannel with the main thread. A MessagePort will be transferred from
@@ -19,7 +20,7 @@ export class MessageChannelCommunicator
 {
   private port: MessagePort | undefined;
 
-  constructor(private workerId: string) {
+  constructor(@Inject(NG_WORKER_ID) private workerId: string) {
     super();
     addEventListener('message', (ev) => {
       if (ev.data === 'portTransfer') {
@@ -38,8 +39,8 @@ export class MessageChannelCommunicator
   sendMessage<T = any>(message: SendMessagePayload<T>): void {
     const payload: MessageEventPayload = {
       ...message,
-      context: NG_WEB_WORKER_CONTEXT,
-      worker: this.workerId,
+      context: NG_IN_WEB_WORKER_CONTEXT,
+      workerId: this.workerId,
     };
 
     this.port?.postMessage(payload);

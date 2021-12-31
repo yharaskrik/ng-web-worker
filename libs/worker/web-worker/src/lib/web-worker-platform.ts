@@ -16,13 +16,12 @@ import {
   WebWorkerApplicationRef,
 } from './platform-providers';
 import { WebWorkerCompilerOptions } from './compiler-options';
-import { NgWebWorkerConfig } from './types';
 import { NG_WEB_WORKER_CONFIG, NG_WORKER_ID } from './tokens';
-import {
-  BroadcastChannelCommunicator,
-  COMMUNICATOR,
-  MessageChannelCommunicator,
-} from '@ng-web-worker/worker/communication';
+
+import { NgInWorkerConfig } from '@ng-web-worker/worker';
+import { MessageChannelCommunicator } from './communication/message-channel-communicator';
+import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
+import { COMMUNICATOR } from './communication/tokens';
 
 const workerId = (Math.random() + 1).toString(36).substring(7);
 
@@ -30,7 +29,7 @@ const workerId = (Math.random() + 1).toString(36).substring(7);
  * Platform definition for WebWorker, it opts to leave out anything that is not needed for running without
  * the DOM
  */
-export const platformWebWorkerFactory = (config: NgWebWorkerConfig) => {
+export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
   /*
    * The Communicator needs to be instantiated as soon as possible because it
    *
@@ -98,7 +97,7 @@ export const platformWebWorkerFactory = (config: NgWebWorkerConfig) => {
  */
 export function bootstrapNgWebWorker<M>(
   moduleType: Type<M>,
-  config: NgWebWorkerConfig,
+  config: NgInWorkerConfig,
   compilerOptions?: WebWorkerCompilerOptions
 ) {
   const platformWebWorker = platformWebWorkerFactory(config);

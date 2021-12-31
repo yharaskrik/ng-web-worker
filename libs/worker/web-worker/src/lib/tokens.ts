@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
-import { NgWebWorkerConfig } from './types';
+import { NgInWorkerConfig } from '@ng-web-worker/worker';
 
-export const NG_WEB_WORKER_CONFIG = new InjectionToken<NgWebWorkerConfig>(
+export const NG_WEB_WORKER_CONFIG = new InjectionToken<NgInWorkerConfig>(
   'ng-web-worker-config'
 );
 

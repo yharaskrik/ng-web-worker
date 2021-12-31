@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@angular/core';
 import { Actions, createEffect } from '@ngrx/effects';
-import { filter, map } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
 import {
   COMMUNICATOR,
-  MessageEventPayload,
   NgWebWorkerCommunication,
-} from '@ng-web-worker/worker/communication';
-import { NG_WORKER_ID } from '@ng-web-worker/worker';
+} from '@ng-web-worker/worker/web-worker';
+import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
 import { Action } from '@ngrx/store';
+import { MessageEventPayload } from '@ng-web-worker/worker/core';
 
 @Injectable()
-export class ActionConnector {
+export class WebWorkerActionConnector {
   /**
    * Will stream the actions received through the messaging channels to the Store within
    * this web worker.

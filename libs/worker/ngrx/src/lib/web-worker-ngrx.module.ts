@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { EffectsModule } from '@ngrx/effects';
-import { ActionConnector } from './action-connector';
+import { WebWorkerActionConnector } from './web-worker-action-connector';
 
 @NgModule({
-  imports: [EffectsModule.forFeature([ActionConnector])],
+  imports: [EffectsModule.forFeature([WebWorkerActionConnector])],
 })
 export class WebWorkerNgrxModule {}

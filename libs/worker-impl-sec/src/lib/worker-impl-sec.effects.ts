@@ -7,7 +7,7 @@ import {
   howAreYou,
   iAmFineThanks,
 } from '@ng-web-worker/actions';
-import { NG_WORKER_ID } from '@ng-web-worker/worker';
+import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
 
 @Injectable()
 export class WorkerImplSecEffects {

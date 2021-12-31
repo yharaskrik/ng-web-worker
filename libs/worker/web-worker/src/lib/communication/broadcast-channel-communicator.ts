@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { NgWebWorkerCommunication } from './types';
+import { BaseChannelCommunicator } from './base-channel.communicator';
+import { NG_WORKER_ID } from '../tokens';
 import {
   MessageEventPayload,
-  NgWebWorkerCommunication,
-  NgWorkerEvent,
-  SendMessagePayload,
-} from './types';
-import {
   NG_WEB_WORKER_BROADCAST_CHANNEL,
-  NG_WEB_WORKER_CONTEXT,
-} from './tokens';
-import { BaseChannelCommunicator } from './base-channel.communicator';
+  NG_IN_WEB_WORKER_CONTEXT,
+  NgInWorkerEvent,
+  SendMessagePayload,
+} from '@ng-web-worker/worker/core';
 
 /**
  * Communicator implementation for BroadcastChannel, this will allow all NgWorkerEvents to be shared between on
@@ -23,7 +22,7 @@ export class BroadcastChannelCommunicator
 {
   private readonly port: BroadcastChannel;
 
-  constructor(private workerId: string) {
+  constructor(@Inject(NG_WORKER_ID) private workerId: string) {
     super();
     this.port = new BroadcastChannel(NG_WEB_WORKER_BROADCAST_CHANNEL);
 
@@ -31,17 +30,17 @@ export class BroadcastChannelCommunicator
   }
 
   registerMessageListener(port: BroadcastChannel): void {
-    port.onmessage = (ev: NgWorkerEvent) => {
+    port.onmessage = (ev: NgInWorkerEvent) => {
       // Want to make sure we do not infinitely loop somehow. Workers should not end up broadcasting to themselves
-      if (ev.data.worker !== this.workerId) this.eventStream$.next(ev);
+      if (ev.data.workerId !== this.workerId) this.eventStream$.next(ev);
     };
   }
 
   sendMessage<T = any>(message: SendMessagePayload<T>): void {
     const payload: MessageEventPayload = {
       ...message,
-      context: NG_WEB_WORKER_CONTEXT,
-      worker: this.workerId,
+      context: NG_IN_WEB_WORKER_CONTEXT,
+      workerId: this.workerId,
     };
 
     this.port?.postMessage(payload);

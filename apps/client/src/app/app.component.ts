@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { WorkerStoreService } from './worker-store.service';
-import { NG_WEB_WORKER_CONTEXT } from '@ng-web-worker/worker/communication';
 import { hi } from '@ng-web-worker/actions';
+import { NG_IN_WEB_WORKER_CONTEXT } from '@ng-web-worker/worker/core';
+import { WebWorkerRegistry } from '@ng-web-worker/worker';
 
 @Component({
   selector: 'ng-web-worker-root',
@@ -9,23 +10,26 @@ import { hi } from '@ng-web-worker/actions';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  readonly messages$ = this.workerStoreService.messageChannel$;
+  constructor(private webWorkerRegistry: WebWorkerRegistry) {
+    this.webWorkerRegistry.registerWorker({
+      workerId: 'worker1',
+      factory: () => new Worker(new URL('./client.worker', import.meta.url)),
+      broadcast: true,
+    });
 
-  constructor(private workerStoreService: WorkerStoreService) {
-    this.workerStoreService.registerWorker(
-      () => new Worker(new URL('./client.worker', import.meta.url))
-    );
-
-    const port = this.workerStoreService.registerWorker(
-      () => new Worker(new URL('./secondary.worker', import.meta.url))
-    );
+    this.webWorkerRegistry.registerWorker({
+      workerId: 'worker2',
+      factory: () => new Worker(new URL('./secondary.worker', import.meta.url)),
+      broadcast: true,
+    });
 
     // After two seconds broadcast a `hi` action to all web workers
     setTimeout(() => {
       console.log('Posting first message');
-      port.postMessage({
+      this.webWorkerRegistry.sendMessage('worker1', {
+        workerId: 'main',
         event: 'action',
-        context: NG_WEB_WORKER_CONTEXT,
+        context: NG_IN_WEB_WORKER_CONTEXT,
         payload: {
           ...hi(),
           workerId: 'main',
