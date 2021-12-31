@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { WorkerStoreService } from './worker-store.service';
 import { hi } from '@ng-web-worker/actions';
 import { NG_IN_WEB_WORKER_CONTEXT } from '@ng-web-worker/worker/core';
 import { WebWorkerRegistry } from '@ng-web-worker/worker';
@@ -36,13 +35,5 @@ export class AppComponent {
         },
       });
     }, 2000);
-
-    // this.messages$.subscribe((m) =>
-    //   console.log(
-    //     `Message event in main thread from worker ${
-    //       m.data.worker
-    //     } with payload ${JSON.stringify(m.data.payload)}`
-    //   )
-    // );
   }
 }
