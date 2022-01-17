@@ -1,7 +1,7 @@
 import { DoBootstrap, NgModule } from '@angular/core';
 import { WebWorkerNgrxModule } from '@ng-web-worker/worker/ngrx';
-import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 import { WorkerImplSecEffects } from './worker-impl-sec.effects';
 
 @NgModule({
@@ -19,7 +19,6 @@ import { WorkerImplSecEffects } from './worker-impl-sec.effects';
   ],
 })
 export class WorkerImplSecModule implements DoBootstrap {
-  ngDoBootstrap(): void {
-    console.log('ngDoBootstrap');
-  }
+  // Bootstrap function must be supplied
+  ngDoBootstrap(): void {}
 }

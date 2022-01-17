@@ -18,6 +18,6 @@ export class MainThreadCommunicator implements MessageDispatcher {
       workerId: 'main',
     };
 
-    this.webWorkerRegistry.ports.forEach((port) => port.postMessage(payload));
+    this.webWorkerRegistry.sendMessageToWorker(payload);
   }
 }

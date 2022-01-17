@@ -1,8 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
-import { map, tap } from 'rxjs';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { helloThere, howAreYou, iAmFineThanks } from '@ng-web-worker/actions';
-import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
+import {
+  NgInWorkerConfig,
+  NG_WEB_WORKER_CONFIG,
+} from '@ng-web-worker/worker/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { map, tap } from 'rxjs';
 
 @Injectable()
 export class WorkerImplEffects {
@@ -10,7 +13,7 @@ export class WorkerImplEffects {
     this._actions$.pipe(
       ofType(helloThere),
       map((action) => {
-        console.log(this.workerId, action.type);
+        console.log(this.config.workerId, action.type);
 
         return howAreYou();
       })
@@ -22,7 +25,7 @@ export class WorkerImplEffects {
       this._actions$.pipe(
         ofType(iAmFineThanks),
         tap((action) => {
-          console.log(this.workerId, action.type);
+          console.log(this.config.workerId, action.type);
         })
       ),
     { dispatch: false }
@@ -30,6 +33,6 @@ export class WorkerImplEffects {
 
   constructor(
     private _actions$: Actions,
-    @Inject(NG_WORKER_ID) private workerId: string
+    @Inject(NG_WEB_WORKER_CONFIG) private config: NgInWorkerConfig
   ) {}
 }

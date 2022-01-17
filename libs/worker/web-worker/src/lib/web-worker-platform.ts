@@ -15,37 +15,39 @@ import {
   COMMUNICATOR,
   MessageEventStream,
   NgInWorkerConfig,
+  NG_WEB_WORKER_CONFIG,
+  WORKER_ID,
 } from '@ng-web-worker/worker/core';
 import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
-import { MessageChannelCommunicator } from './communication/message-channel-communicator';
 import { WebWorkerCompilerOptions } from './compiler-options';
 import {
   WebHandlerErrorHandler,
   WebWorkerApplicationRef,
 } from './platform-providers';
-import { NG_WEB_WORKER_CONFIG, NG_WORKER_ID } from './tokens';
 
-const workerId = (Math.random() + 1).toString(36).substring(7);
+let ngInWorkerConfig: NgInWorkerConfig;
+
+try {
+  if (!self.name) {
+    throw new Error();
+  }
+
+  ngInWorkerConfig = JSON.parse(self.name);
+
+  if (ngInWorkerConfig == null) {
+    throw new Error();
+  }
+} catch (e) {
+  throw new Error(
+    `No configuration or no valid configuration passed into WebWorker.`
+  );
+}
 
 /**
  * Platform definition for WebWorker, it opts to leave out anything that is not needed for running without
  * the DOM
  */
 export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
-  const messageEventStream = new MessageEventStream();
-  /*
-   * The Communicator needs to be instantiated as soon as possible because it
-   *
-   * In the case of MessageChannelCommunicator:
-   * Adds an event listener that will accept the MessagePort for use with communicating back and forth.
-   *
-   * In the case of BroadcastChannel:
-   * It does not matter too much as there is no initial transfer of ports.
-   */
-  const communicator = config.broadcast
-    ? new BroadcastChannelCommunicator(workerId, messageEventStream)
-    : new MessageChannelCommunicator(workerId, messageEventStream);
-
   return createPlatformFactory(platformCore, 'webWorker', [
     {
       provide: ErrorHandler,
@@ -77,16 +79,21 @@ export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
       useValue: config,
     },
     {
-      provide: COMMUNICATOR,
-      useValue: communicator,
-    },
-    {
-      provide: NG_WORKER_ID,
-      useValue: workerId,
+      provide: WORKER_ID,
+      useValue: config.workerId,
     },
     {
       provide: MessageEventStream,
-      useValue: messageEventStream,
+      useValue: new MessageEventStream(),
+    },
+    {
+      provide: COMMUNICATOR,
+      useFactory: (
+        ngInWorkerConfig: NgInWorkerConfig,
+        messageEventStream: MessageEventStream
+      ) =>
+        new BroadcastChannelCommunicator(ngInWorkerConfig, messageEventStream),
+      deps: [NG_WEB_WORKER_CONFIG, MessageEventStream],
     },
   ]);
 };
@@ -104,10 +111,9 @@ export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
  */
 export function bootstrapNgWebWorker<M>(
   moduleType: Type<M>,
-  config: NgInWorkerConfig,
   compilerOptions?: WebWorkerCompilerOptions
 ) {
-  const platformWebWorker = platformWebWorkerFactory(config);
+  const platformWebWorker = platformWebWorkerFactory(ngInWorkerConfig);
 
   return platformWebWorker().bootstrapModule(moduleType, {
     ...(compilerOptions ?? {}),

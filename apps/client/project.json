@@ -21,7 +21,6 @@
         "vendorChunk": true,
         "optimization": false,
         "webWorkerTsConfig": "apps/client/tsconfig.worker.json",
-        "aot": false,
         "outputHashing": "all",
         "namedChunks": true
       },
@@ -40,22 +39,33 @@
         "development": {
           "extractLicenses": false,
           "sourceMap": true,
-          "namedChunks": true
-        }
+          "namedChunks": true,
+          "aot": false
+        },
+        "serve": {}
       },
       "defaultConfiguration": "production"
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
-        "production": {
-          "browserTarget": "client:build:production"
-        },
         "development": {
           "browserTarget": "client:build:development"
         }
       },
       "defaultConfiguration": "development"
+    },
+    "serve-build": {
+      "executor": "@nrwl/web:file-server",
+      "options": {
+        "buildTarget": "client:build"
+      },
+      "configurations": {
+        "serve": {
+          "buildTarget": "client:build:serve"
+        }
+      },
+      "defaultConfiguration": "serve"
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",

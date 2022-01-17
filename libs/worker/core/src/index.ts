@@ -5,6 +5,7 @@ export type {
   MessageEventPayload,
   NgInWorkerConfig,
   NgInWorkerEvent,
+  RegisterWorkerConfig,
   SendMessagePayload,
   WorkerFactory,
 } from './lib/types';

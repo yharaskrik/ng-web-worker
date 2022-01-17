@@ -1,13 +1,16 @@
 import { Inject, Injectable } from '@angular/core';
-import { map } from 'rxjs';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
   helloThere,
   hi,
   howAreYou,
   iAmFineThanks,
 } from '@ng-web-worker/actions';
-import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
+import {
+  NgInWorkerConfig,
+  NG_WEB_WORKER_CONFIG,
+} from '@ng-web-worker/worker/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { map } from 'rxjs';
 
 @Injectable()
 export class WorkerImplSecEffects {
@@ -15,7 +18,7 @@ export class WorkerImplSecEffects {
     this._actions$.pipe(
       ofType(hi),
       map((action) => {
-        console.log(this.workerId, action.type);
+        console.log(this.config.workerId, action.type);
 
         return helloThere();
       })
@@ -26,7 +29,7 @@ export class WorkerImplSecEffects {
     this._actions$.pipe(
       ofType(howAreYou),
       map((action) => {
-        console.log(this.workerId, action.type);
+        console.log(this.config.workerId, action.type);
 
         return iAmFineThanks();
       })
@@ -35,6 +38,6 @@ export class WorkerImplSecEffects {
 
   constructor(
     private _actions$: Actions,
-    @Inject(NG_WORKER_ID) private workerId: string
+    @Inject(NG_WEB_WORKER_CONFIG) private config: NgInWorkerConfig
   ) {}
 }

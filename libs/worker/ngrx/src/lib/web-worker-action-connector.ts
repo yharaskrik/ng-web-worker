@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
-import { Actions, createEffect } from '@ngrx/effects';
-import { filter, map } from 'rxjs';
-import { NG_WORKER_ID } from '@ng-web-worker/worker/web-worker';
-import { Action } from '@ngrx/store';
 import {
   COMMUNICATOR,
   MessageDispatcher,
   MessageEventPayload,
   MessageEventStream,
+  WORKER_ID,
 } from '@ng-web-worker/worker/core';
+import { Actions, createEffect } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
+import { filter, map } from 'rxjs';
 
 @Injectable()
 export class WebWorkerActionConnector {
@@ -25,8 +25,7 @@ export class WebWorkerActionConnector {
            * We should only be mapping external actions (from other web workers or main thread) to the action
            * stream within this web worker.
            */
-          data.event === 'action' &&
-          (!data.payload.workerId || this.workerId !== data.payload.workerId)
+          data.event === 'action' && this.workerId !== data.payload.workerId
       ),
       map((data) => data.payload)
     )
@@ -47,14 +46,12 @@ export class WebWorkerActionConnector {
   readonly actionToChannel$ = createEffect(
     () =>
       this._actions$.pipe(
-        filter(
-          (action) => !(action as any).workerId || this.workerId === 'main'
-        ),
+        filter((action) => !(action as any).workerId),
         map((action) => {
           this.communicator.sendMessage({
             event: 'action',
             /*
-             * External must be patched onto the action here otherwise when the other contexts receive it
+             * The current WebWorker's ID must be patched onto the action here otherwise when the other contexts receive it
              * they will not allow it to pass through the stream from `WebWorkerActions`
              */
             payload: { ...action, workerId: this.workerId },
@@ -66,7 +63,8 @@ export class WebWorkerActionConnector {
 
   constructor(
     private messageEventStream: MessageEventStream,
-    @Inject(NG_WORKER_ID) private workerId: string,
+    @Inject(WORKER_ID)
+    private workerId: string,
     private _actions$: Actions,
     @Inject(COMMUNICATOR) private communicator: MessageDispatcher
   ) {}

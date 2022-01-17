@@ -1,5 +1,5 @@
 export interface MessageEventPayload<T = any> {
-  workerId: string;
+  workerId: string | 'main';
   context: 'ng-web-worker';
   event: string;
   payload: T;
@@ -16,10 +16,18 @@ export interface MessageDispatcher {
   sendMessage<T = any>(message: SendMessagePayload<T>): void;
 }
 
-export type WorkerFactory = () => Worker;
+export type WorkerFactory = (name: string) => Worker;
 
-export interface NgInWorkerConfig {
+export interface RegisterWorkerConfig {
   workerId: string;
-  broadcast: boolean;
-  factory?: WorkerFactory;
+  factory: WorkerFactory;
+}
+
+/**
+ * The configuration passed down into the WebWorker via the `name` property.
+ */
+export interface NgInWorkerConfig {
+  instanceId: string;
+  workerId: string;
+  share: boolean;
 }

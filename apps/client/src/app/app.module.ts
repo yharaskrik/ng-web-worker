@@ -6,14 +6,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AppComponent } from './app.component';
-import { CoincapStateModule } from './coincap/coincap-state.module';
-import { CoinCapStatsModule } from './coincap/stats/coin-cap-stats.module';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-    NgInWorkerModule.forRoot(),
+    NgInWorkerModule.forRoot({ share: true }),
     StoreModule.forRoot(
       {},
       {
@@ -25,8 +23,6 @@ import { CoinCapStatsModule } from './coincap/stats/coin-cap-stats.module';
     EffectsModule.forRoot(),
     StoreDevtoolsModule.instrument(),
     WebWorkerNgrxModule,
-    CoincapStateModule,
-    CoinCapStatsModule,
   ],
   bootstrap: [AppComponent],
 })
