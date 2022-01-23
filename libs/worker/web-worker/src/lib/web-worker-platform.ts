@@ -12,12 +12,15 @@ import {
 } from '@angular/core';
 import { JitCompilerFactory } from '@angular/platform-browser-dynamic';
 import {
+  BROADCAST_CHANNEL,
   COMMUNICATOR,
+  Logger,
   MessageEventStream,
-  NgInWorkerConfig,
-  NG_WEB_WORKER_CONFIG,
+  NG_IN_WORKER_CONFIG,
+  WorkerConfig,
   WORKER_ID,
 } from '@ng-web-worker/worker/core';
+import { createBroadcastChannel } from '../../../core/src/lib/broadcast-channel';
 import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
 import { WebWorkerCompilerOptions } from './compiler-options';
 import {
@@ -25,7 +28,7 @@ import {
   WebWorkerApplicationRef,
 } from './platform-providers';
 
-let ngInWorkerConfig: NgInWorkerConfig;
+let ngInWorkerConfig: WorkerConfig;
 
 try {
   if (!self.name) {
@@ -47,8 +50,45 @@ try {
  * Platform definition for WebWorker, it opts to leave out anything that is not needed for running without
  * the DOM
  */
-export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
+export const platformWebWorkerFactory = (config: WorkerConfig) => {
   return createPlatformFactory(platformCore, 'webWorker', [
+    {
+      provide: NG_IN_WORKER_CONFIG,
+      useValue: config,
+    },
+    {
+      provide: WORKER_ID,
+      useValue: config.workerId,
+    },
+    {
+      provide: MessageEventStream,
+      useClass: MessageEventStream,
+    },
+    {
+      provide: BROADCAST_CHANNEL,
+      useValue: createBroadcastChannel(config.instanceId, config.share),
+    },
+    {
+      provide: COMMUNICATOR,
+      useFactory: (
+        ngInWorkerConfig: WorkerConfig,
+        messageEventStream: MessageEventStream,
+        broadcastChannel: BroadcastChannel
+      ) =>
+        new BroadcastChannelCommunicator(
+          ngInWorkerConfig,
+          messageEventStream,
+          broadcastChannel
+        ),
+      deps: [NG_IN_WORKER_CONFIG, MessageEventStream, BROADCAST_CHANNEL],
+    },
+    {
+      provide: Logger,
+      useClass: Logger,
+    },
+    /**
+     * Required providers to be able to bootstrap an Angular application
+     */
     {
       provide: ErrorHandler,
       useClass: WebHandlerErrorHandler,
@@ -73,27 +113,6 @@ export const platformWebWorkerFactory = (config: NgInWorkerConfig) => {
       provide: CompilerFactory,
       useClass: JitCompilerFactory,
       deps: [COMPILER_OPTIONS],
-    },
-    {
-      provide: NG_WEB_WORKER_CONFIG,
-      useValue: config,
-    },
-    {
-      provide: WORKER_ID,
-      useValue: config.workerId,
-    },
-    {
-      provide: MessageEventStream,
-      useValue: new MessageEventStream(),
-    },
-    {
-      provide: COMMUNICATOR,
-      useFactory: (
-        ngInWorkerConfig: NgInWorkerConfig,
-        messageEventStream: MessageEventStream
-      ) =>
-        new BroadcastChannelCommunicator(ngInWorkerConfig, messageEventStream),
-      deps: [NG_WEB_WORKER_CONFIG, MessageEventStream],
     },
   ]);
 };

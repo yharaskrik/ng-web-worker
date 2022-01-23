@@ -1,7 +1,13 @@
 import { Component, Inject } from '@angular/core';
 import { hi } from '@ng-web-worker/actions';
 import { WebWorkerRegistry } from '@ng-web-worker/worker';
-import { COMMUNICATOR, MessageDispatcher } from '@ng-web-worker/worker/core';
+import {
+  COMMUNICATOR,
+  MessageDispatcher,
+  MessageEventStream,
+  ofEvent,
+} from '@ng-web-worker/worker/core';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'ng-web-worker-root',
@@ -11,27 +17,25 @@ import { COMMUNICATOR, MessageDispatcher } from '@ng-web-worker/worker/core';
 export class AppComponent {
   constructor(
     private webWorkerRegistry: WebWorkerRegistry,
-    @Inject(COMMUNICATOR) private communicator: MessageDispatcher
+    @Inject(COMMUNICATOR) private communicator: MessageDispatcher,
+    private messageEventStream: MessageEventStream
   ) {
-    this.webWorkerRegistry.registerWorker({
-      workerId: 'worker1',
-      factory: (name: string) =>
-        new Worker(new URL('./client.worker', import.meta.url), {
-          name,
-        }),
-    });
+    this.messageEventStream
+      .stream()
+      .pipe(
+        ofEvent<number>('timer'),
+        map((event) => event.data)
+      )
+      .subscribe((data) => {
+        console.log(data.payload);
+      });
 
-    this.webWorkerRegistry.registerWorker({
-      workerId: 'worker2',
-      factory: (name: string) =>
-        new Worker(new URL('./secondary.worker', import.meta.url), {
-          name,
-        }),
-    });
+    this.webWorkerRegistry.initializeWorker('worker1');
+    this.webWorkerRegistry.initializeWorker('worker2');
 
     // After two seconds broadcast a `hi` action to all web workers
+    console.log('Saying Hi in two seconds.');
     setTimeout(() => {
-      console.log('Posting first message');
       this.communicator.sendMessage({
         event: 'action',
         payload: {
@@ -40,5 +44,12 @@ export class AppComponent {
         },
       });
     }, 2000);
+
+    setTimeout(() => {
+      this.webWorkerRegistry.terminateWorker('worker1');
+      this.webWorkerRegistry.terminateWorker('worker2');
+      this.webWorkerRegistry.terminateWorker('worker1');
+      this.webWorkerRegistry.terminateWorker('workerDoesntExist');
+    }, 4000);
   }
 }

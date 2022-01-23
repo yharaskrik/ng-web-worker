@@ -1,5 +1,10 @@
 import { InjectionToken } from '@angular/core';
-import { NgInWorkerRegistryConfig } from './types';
+import { RegisterWorkerConfig } from './types';
 
-export const NG_IN_WORKER_REGISTRY_CONFIG =
-  new InjectionToken<NgInWorkerRegistryConfig>('ng-in-worker-registry-config');
+export const WORKERS = new InjectionToken<RegisterWorkerConfig[]>(
+  'register-worker-configs'
+);
+
+export const INITIALIZE_WORKERS = new InjectionToken<boolean>(
+  'initialize-workers'
+);

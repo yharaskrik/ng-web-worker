@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { filter, Observable, Subject } from 'rxjs';
-import { NG_IN_WEB_WORKER_CONTEXT } from './tokens';
+import { NG_IN_WORKER_CONTEXT } from './tokens';
 import { NgInWorkerEvent } from './types';
 
 /**
@@ -22,8 +22,7 @@ export class MessageEventStream implements OnDestroy {
    */
   protected readonly events$ = this.eventStream$.pipe(
     filter(
-      (ev): ev is NgInWorkerEvent =>
-        ev.data?.context === NG_IN_WEB_WORKER_CONTEXT
+      (ev): ev is NgInWorkerEvent => ev.data?.context === NG_IN_WORKER_CONTEXT
     )
   );
 

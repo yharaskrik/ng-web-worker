@@ -11,7 +11,27 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-    NgInWorkerModule.forRoot({ share: true }),
+    NgInWorkerModule.forRoot({
+      share: true,
+      initializeWorkers: true,
+      workers: [
+        {
+          workerId: 'worker1',
+          factory: (name: string) =>
+            new Worker(new URL('./client.worker', import.meta.url), {
+              name,
+            }),
+        },
+        {
+          workerId: 'worker2',
+          factory: (name: string) =>
+            new Worker(new URL('./secondary.worker', import.meta.url), {
+              name,
+            }),
+          initialize: false,
+        },
+      ],
+    }),
     StoreModule.forRoot(
       {},
       {

@@ -5,10 +5,7 @@ import {
   howAreYou,
   iAmFineThanks,
 } from '@ng-web-worker/actions';
-import {
-  NgInWorkerConfig,
-  NG_WEB_WORKER_CONFIG,
-} from '@ng-web-worker/worker/core';
+import { NG_IN_WORKER_CONFIG, WorkerConfig } from '@ng-web-worker/worker/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map } from 'rxjs';
 
@@ -38,6 +35,6 @@ export class WorkerImplSecEffects {
 
   constructor(
     private _actions$: Actions,
-    @Inject(NG_WEB_WORKER_CONFIG) private config: NgInWorkerConfig
+    @Inject(NG_IN_WORKER_CONFIG) private config: WorkerConfig
   ) {}
 }

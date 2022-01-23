@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
 import {
+  BROADCAST_CHANNEL,
   MessageDispatcher,
   MessageEventPayload,
   MessageEventStream,
-  NgInWorkerConfig,
   NgInWorkerEvent,
-  NG_IN_WEB_WORKER_CONTEXT,
-  NG_WEB_WORKER_BROADCAST_CHANNEL,
-  NG_WEB_WORKER_CONFIG,
+  NG_IN_WORKER_CONFIG,
+  NG_IN_WORKER_CONTEXT,
   SendMessagePayload,
+  WorkerConfig,
 } from '@ng-web-worker/worker/core';
 import { NgWebWorkerCommunication } from './types';
 
@@ -21,20 +21,13 @@ import { NgWebWorkerCommunication } from './types';
 export class BroadcastChannelCommunicator
   implements NgWebWorkerCommunication, MessageDispatcher
 {
-  private readonly port: BroadcastChannel;
-
   constructor(
-    @Inject(NG_WEB_WORKER_CONFIG)
-    private config: NgInWorkerConfig,
-    private messageEventStream: MessageEventStream
+    @Inject(NG_IN_WORKER_CONFIG)
+    private config: WorkerConfig,
+    private messageEventStream: MessageEventStream,
+    @Inject(BROADCAST_CHANNEL) private broadcastChannel: BroadcastChannel
   ) {
-    const channel = this.config.share
-      ? NG_WEB_WORKER_BROADCAST_CHANNEL
-      : `${this.config.instanceId}:${NG_WEB_WORKER_BROADCAST_CHANNEL}`;
-
-    this.port = new BroadcastChannel(channel);
-
-    this.registerMessageListener(this.port);
+    this.registerMessageListener(this.broadcastChannel);
   }
 
   registerMessageListener(port: BroadcastChannel): void {
@@ -48,10 +41,10 @@ export class BroadcastChannelCommunicator
   sendMessage<T = any>(message: SendMessagePayload<T>): void {
     const payload: MessageEventPayload = {
       ...message,
-      context: NG_IN_WEB_WORKER_CONTEXT,
+      context: NG_IN_WORKER_CONTEXT,
       workerId: this.config.workerId,
     };
 
-    this.port?.postMessage(payload);
+    this.broadcastChannel.postMessage(payload);
   }
 }

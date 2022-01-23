@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   MessageDispatcher,
   MessageEventPayload,
-  NG_IN_WEB_WORKER_CONTEXT,
+  NG_IN_WORKER_CONTEXT,
   SendMessagePayload,
 } from '@ng-web-worker/worker/core';
 import { WebWorkerRegistry } from './web-worker-registry';
@@ -14,7 +14,7 @@ export class MainThreadCommunicator implements MessageDispatcher {
   sendMessage<T = any>(message: SendMessagePayload<T>) {
     const payload: MessageEventPayload = {
       ...message,
-      context: NG_IN_WEB_WORKER_CONTEXT,
+      context: NG_IN_WORKER_CONTEXT,
       workerId: 'main',
     };
 
