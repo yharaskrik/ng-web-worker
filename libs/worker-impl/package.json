@@ -2,8 +2,10 @@
   "name": "@ng-web-worker/worker-impl",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^13.1.0",
-    "@angular/core": "^13.1.0"
+    "@angular/common": "^11 || ^12 || ^13",
+    "@angular/core": "^11 || ^12 || ^13",
+    "@ngrx/store": "^11 || ^12 || ^13",
+    "@ngrx/effects": "^11 || ^12 || ^13"
   },
   "dependencies": {
     "tslib": "^2.3.0"

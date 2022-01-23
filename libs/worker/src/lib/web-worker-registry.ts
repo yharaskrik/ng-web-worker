@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@angular/core';
 import {
   BROADCAST_CHANNEL,
   Logger,
-  MessageEventPayload,
   MessageEventStream,
   NgInWorkerEvent,
   NG_IN_WORKER_CONFIG,
@@ -124,9 +123,5 @@ export class WebWorkerRegistry {
     }
 
     this.initializeWorker(workerId);
-  }
-
-  sendMessageToWorker(message: MessageEventPayload): void {
-    this.broadcastChannel.postMessage(message);
   }
 }

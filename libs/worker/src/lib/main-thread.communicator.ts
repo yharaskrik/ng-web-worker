@@ -1,15 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
+  BROADCAST_CHANNEL,
   MessageDispatcher,
   MessageEventPayload,
   NG_IN_WORKER_CONTEXT,
   SendMessagePayload,
 } from '@ng-web-worker/worker/core';
-import { WebWorkerRegistry } from './web-worker-registry';
 
 @Injectable()
 export class MainThreadCommunicator implements MessageDispatcher {
-  constructor(private webWorkerRegistry: WebWorkerRegistry) {}
+  constructor(
+    @Inject(BROADCAST_CHANNEL) private broadcastChannel: BroadcastChannel
+  ) {}
 
   sendMessage<T = any>(message: SendMessagePayload<T>) {
     const payload: MessageEventPayload = {
@@ -18,6 +20,6 @@ export class MainThreadCommunicator implements MessageDispatcher {
       workerId: 'main',
     };
 
-    this.webWorkerRegistry.sendMessageToWorker(payload);
+    this.broadcastChannel.postMessage(payload);
   }
 }

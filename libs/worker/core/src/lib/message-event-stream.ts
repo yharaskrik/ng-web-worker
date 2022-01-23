@@ -3,10 +3,6 @@ import { filter, Observable, Subject } from 'rxjs';
 import { NG_IN_WORKER_CONTEXT } from './tokens';
 import { NgInWorkerEvent } from './types';
 
-/**
- * The BaseChannelCommunicator contains the shared properties that both the Broadcast method and MessageChannel
- * method use to stream events.
- */
 @Injectable()
 export class MessageEventStream implements OnDestroy {
   /*
