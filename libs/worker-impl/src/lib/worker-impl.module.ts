@@ -12,11 +12,11 @@ import { WorkerImplEffects } from './worker-impl.effects';
 
 @Injectable()
 export class IntervalService {
-  constructor(@Inject(COMMUNICATOR) private communicator: MessageDispatcher) {
+  constructor(@Inject(COMMUNICATOR) private dispatcher: MessageDispatcher) {
     console.warn('Initialized timer service');
   }
 
-  readonly timer$ = interval(1000).pipe(postEvent('timer', this.communicator));
+  readonly timer$ = interval(1000).pipe(postEvent('timer', this.dispatcher));
 }
 
 @NgModule({
@@ -31,8 +31,7 @@ export class IntervalService {
     ),
     EffectsModule.forRoot([WorkerImplEffects]),
     WebWorkerNgrxModule,
-    WorkerServicesModule.forRoot([]),
-    WorkerServicesModule.forFeature([IntervalService]),
+    WorkerServicesModule.forRoot([IntervalService]),
   ],
 })
 export class WorkerImplModule implements DoBootstrap {
