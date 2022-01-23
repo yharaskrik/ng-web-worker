@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/worker",
-    "lib": ["es2018", "webworker"],
+    "lib": ["ESNext", "webworker"],
     "types": []
   },
   "include": ["src/**/*.worker.ts"]

@@ -46,10 +46,10 @@ export class AppComponent {
     }, 2000);
 
     setTimeout(() => {
-      this.webWorkerRegistry.terminateWorker('worker1');
-      this.webWorkerRegistry.terminateWorker('worker2');
-      this.webWorkerRegistry.terminateWorker('worker1');
-      this.webWorkerRegistry.terminateWorker('workerDoesntExist');
+      // this.webWorkerRegistry.terminateWorker('worker1');
+      // this.webWorkerRegistry.terminateWorker('worker2');
+      // this.webWorkerRegistry.terminateWorker('worker1');
+      // this.webWorkerRegistry.terminateWorker('workerDoesntExist');
     }, 4000);
   }
 }

@@ -1,7 +1,10 @@
 import { DoBootstrap, Inject, Injectable, NgModule } from '@angular/core';
 import { COMMUNICATOR, MessageDispatcher } from '@ng-web-worker/worker/core';
 import { WebWorkerNgrxModule } from '@ng-web-worker/worker/ngrx';
-import { postEvent } from '@ng-web-worker/worker/web-worker';
+import {
+  postEvent,
+  WorkerServicesModule,
+} from '@ng-web-worker/worker/web-worker';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { interval } from 'rxjs';
@@ -9,7 +12,9 @@ import { WorkerImplEffects } from './worker-impl.effects';
 
 @Injectable()
 export class TimerService {
-  constructor(@Inject(COMMUNICATOR) private communicator: MessageDispatcher) {}
+  constructor(@Inject(COMMUNICATOR) private communicator: MessageDispatcher) {
+    console.warn('Initialized timer service');
+  }
 
   readonly timer$ = interval(1000).pipe(postEvent('timer', this.communicator));
 }
@@ -26,11 +31,11 @@ export class TimerService {
     ),
     EffectsModule.forRoot([WorkerImplEffects]),
     WebWorkerNgrxModule,
+    WorkerServicesModule.forRoot([]),
+    WorkerServicesModule.forFeature([TimerService]),
   ],
-  providers: [TimerService],
 })
 export class WorkerImplModule implements DoBootstrap {
-  constructor(private timerService: TimerService) {}
   // Bootstrap function must be supplied
   ngDoBootstrap(): void {}
 }
