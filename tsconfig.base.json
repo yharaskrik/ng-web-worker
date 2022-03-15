@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@ng-web-worker/actions": ["libs/actions/src/index.ts"],
+      "@ng-web-worker/simple-worker": ["libs/simple-worker/src/index.ts"],
       "@ng-web-worker/worker": ["libs/worker/src/index.ts"],
       "@ng-web-worker/worker-impl": ["libs/worker-impl/src/index.ts"],
       "@ng-web-worker/worker-impl-sec": ["libs/worker-impl-sec/src/index.ts"],

@@ -14,18 +14,18 @@ import { JitCompilerFactory } from '@angular/platform-browser-dynamic';
 import {
   BROADCAST_CHANNEL,
   COMMUNICATOR,
+  createBroadcastChannel,
   Logger,
   MessageEventStream,
   NG_IN_WORKER_CONFIG,
   WorkerConfig,
   WORKER_ID,
 } from '@ng-web-worker/worker/core';
-import { createBroadcastChannel } from '../../../core/src/lib/broadcast-channel';
 import { BroadcastChannelCommunicator } from './communication/broadcast-channel-communicator';
 import { WebWorkerCompilerOptions } from './compiler-options';
 import {
-  WebHandlerErrorHandler,
   WebWorkerApplicationRef,
+  WebWorkerHandlerErrorHandler,
 } from './platform-providers';
 
 let ngInWorkerConfig: WorkerConfig;
@@ -91,7 +91,7 @@ export const platformWebWorkerFactory = (config: WorkerConfig) => {
      */
     {
       provide: ErrorHandler,
-      useClass: WebHandlerErrorHandler,
+      useClass: WebWorkerHandlerErrorHandler,
     },
     {
       provide: ApplicationInitStatus,
@@ -125,7 +125,6 @@ export const platformWebWorkerFactory = (config: WorkerConfig) => {
  *
  * `ngZone` is obviously unneeded as there is no monkey patching required when there is no DOM.
  * @param moduleType
- * @param config
  * @param compilerOptions
  */
 export function bootstrapNgWebWorker<M>(

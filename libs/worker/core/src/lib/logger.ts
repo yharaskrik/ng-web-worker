@@ -1,9 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
-import {
-  NG_IN_WORKER_CONFIG,
-  WorkerConfig,
-  WORKER_ID,
-} from '@ng-web-worker/worker/core';
+import { NG_IN_WORKER_CONFIG, WORKER_ID } from './tokens';
+import { WorkerConfig } from './types';
 
 @Injectable()
 export class Logger {

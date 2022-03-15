@@ -1,0 +1,42 @@
+{
+  "projectType": "library",
+  "root": "libs/simple-worker",
+  "sourceRoot": "libs/simple-worker/src",
+  "prefix": "ng-web-worker",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:ng-packagr-lite",
+      "outputs": ["dist/libs/simple-worker"],
+      "options": {
+        "project": "libs/simple-worker/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/simple-worker/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/simple-worker/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/simple-worker"],
+      "options": {
+        "jestConfig": "libs/simple-worker/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/simple-worker/src/**/*.ts",
+          "libs/simple-worker/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

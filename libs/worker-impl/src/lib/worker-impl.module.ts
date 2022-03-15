@@ -11,7 +11,7 @@ import { interval } from 'rxjs';
 import { WorkerImplEffects } from './worker-impl.effects';
 
 @Injectable()
-export class IntervalService {
+export class TimerService {
   constructor(@Inject(COMMUNICATOR) private dispatcher: MessageDispatcher) {
     console.warn('Initialized timer service');
   }
@@ -31,7 +31,7 @@ export class IntervalService {
     ),
     EffectsModule.forRoot([WorkerImplEffects]),
     WebWorkerNgrxModule,
-    WorkerServicesModule.forRoot([IntervalService]),
+    WorkerServicesModule.forRoot([TimerService]),
   ],
 })
 export class WorkerImplModule implements DoBootstrap {

@@ -3,6 +3,7 @@
   "projects": {
     "actions": "libs/actions",
     "client": "apps/client",
+    "simple-worker": "libs/simple-worker",
     "worker": "libs/worker",
     "worker-impl": "libs/worker-impl",
     "worker-impl-sec": "libs/worker-impl-sec"

@@ -1,4 +1,4 @@
-import { NG_IN_WORKER_BROADCAST_CHANNEL } from '@ng-web-worker/worker/core';
+import { NG_IN_WORKER_BROADCAST_CHANNEL } from './tokens';
 
 /**
  * Create the BroadcastChannel that will manage event sending between workers and the main thread.

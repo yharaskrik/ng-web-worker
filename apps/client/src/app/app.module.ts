@@ -30,6 +30,14 @@ import { AppComponent } from './app.component';
             }),
           initialize: false,
         },
+        {
+          workerId: 'simpleWorker',
+          factory: (name: string) =>
+            new Worker(new URL('./simple.worker', import.meta.url), {
+              name,
+            }),
+          initialize: true,
+        },
       ],
     }),
     StoreModule.forRoot(

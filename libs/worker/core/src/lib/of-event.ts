@@ -1,5 +1,5 @@
-import { NgInWorkerEvent } from '@ng-web-worker/worker/core';
 import { filter, Observable } from 'rxjs';
+import type { NgInWorkerEvent } from './types';
 
 /**
  * Filters an event stream from the BroadcastChannel by the event and optionally by the workerId
